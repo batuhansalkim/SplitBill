@@ -291,7 +291,33 @@ We welcome contributions from the community! Please read our [Contributing Guide
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+**Proprietary Software - All Rights Reserved**
+
+Copyright (c) 2025 Batuhan Salkım. All rights reserved.
+
+This software is proprietary and confidential. Unauthorized copying, distribution, or use is strictly prohibited.
+
+### Commercial Licensing
+For licensing inquiries and commercial use, please contact:
+- **Email**: batuhan@salkim.com
+- **LinkedIn**: [Batuhan Salkım](https://linkedin.com/in/batuhansalkim)
+- **Pricing**: Available upon request
+
+### Available Packages
+
+| Package | Price | Features |
+|---------|-------|----------|
+| **Starter** | $1,500 | Basic features, 1 restaurant, email support |
+| **Professional** | $3,500 | Full features, 5 restaurants, priority support |
+| **Enterprise** | $10,000+ | Custom development, unlimited restaurants, 24/7 support |
+
+### What's Included
+- ✅ Complete source code
+- ✅ Installation guide
+- ✅ Technical documentation
+- ✅ Customization support
+- ✅ Training materials
+- ✅ 1 year of updates
 
 ## 🆘 Support
 
