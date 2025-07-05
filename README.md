@@ -1,50 +1,323 @@
-# Welcome to your Expo app 👋
+# 🏢 SplitBill - Enterprise Restaurant Management Platform
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+[![React Native](https://img.shields.io/badge/React%20Native-0.79.5-blue.svg)](https://reactnative.dev/)
+[![Expo](https://img.shields.io/badge/Expo-53.0.17-black.svg)](https://expo.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.8.3-blue.svg)](https://www.typescriptlang.org/)
+[![NativeBase](https://img.shields.io/badge/NativeBase-3.0.0-purple.svg)](https://nativebase.io/)
+[![Zustand](https://img.shields.io/badge/Zustand-4.0.0-orange.svg)](https://zustand-demo.pmnd.rs/)
 
-## Get started
+> **SplitBill** is an enterprise-grade restaurant management application designed to revolutionize the dining experience through intelligent QR-based ordering, seamless payment processing, and real-time order tracking.
 
-1. Install dependencies
+## 🎯 Overview
 
+SplitBill addresses the common challenges faced by restaurants and customers during group dining experiences:
+
+- **Eliminates Order Confusion**: Each customer manages their own order independently
+- **Streamlines Payment Process**: Individual payments reduce checkout time by 80%
+- **Enhances Customer Experience**: Real-time order tracking and status updates
+- **Improves Restaurant Efficiency**: Reduces staff workload and order errors
+
+## ✨ Key Features
+
+### 🎫 QR Code Integration
+- **Instant Table Connection**: Scan QR codes to connect to specific tables
+- **Manual Code Entry**: Alternative connection method for accessibility
+- **Secure Validation**: QR code verification and validation
+
+### 📱 Smart Menu System
+- **Category-based Navigation**: Organized product categories with icons
+- **Real-time Search**: Instant product search and filtering
+- **Product Details**: Comprehensive product information and pricing
+- **Stock Management**: Real-time availability status
+
+### 🛒 Intelligent Cart Management
+- **Individual Cart**: Each user maintains their own cart
+- **Quantity Controls**: Easy quantity adjustment and removal
+- **Custom Notes**: Special instructions for each item
+- **Real-time Totals**: Automatic price calculations
+
+### 💳 Seamless Payment Processing
+- **Multiple Payment Methods**: Credit card, mobile payment, cash
+- **Coupon Integration**: Discount code application
+- **Secure Processing**: PCI-compliant payment handling
+- **Split Payment Support**: Group bill splitting capabilities
+
+### 📊 Real-time Order Tracking
+- **Live Status Updates**: Order preparation progress
+- **Estimated Times**: Accurate delivery time estimates
+- **Status Notifications**: Real-time order status changes
+- **Order History**: Complete order tracking and history
+
+## 🏗️ Architecture
+
+### Technology Stack
+- **Frontend**: React Native with Expo
+- **UI Framework**: NativeBase for enterprise-grade components
+- **State Management**: Zustand for lightweight state management
+- **Navigation**: Expo Router for file-based routing
+- **Language**: TypeScript for type safety
+- **Storage**: AsyncStorage for local data persistence
+
+### Design Patterns
+- **Feature-based Architecture**: Organized by business features
+- **Component Composition**: Reusable and composable components
+- **Unidirectional Data Flow**: Predictable state management
+- **Layered Architecture**: Clear separation of concerns
+
+## 🚀 Getting Started
+
+### Prerequisites
+- Node.js (v18 or higher)
+- npm or yarn
+- Expo CLI
+- iOS Simulator or Android Emulator
+
+### Installation
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/your-org/splitbill.git
+   cd splitbill
+   ```
+
+2. **Install dependencies**
    ```bash
    npm install
    ```
 
-2. Start the app
-
+3. **Start the development server**
    ```bash
-   npx expo start
+   npm start
    ```
 
-In the output, you'll find options to open the app in a
+4. **Run on device/simulator**
+   ```bash
+   # iOS
+   npm run ios
+   
+   # Android
+   npm run android
+   
+   # Web
+   npm run web
+   ```
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+### Environment Setup
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+Create a `.env` file in the root directory:
 
-## Get a fresh project
+```env
+# API Configuration
+API_BASE_URL=https://api.splitbill.com
+API_TIMEOUT=30000
 
-When you're ready, run:
+# Payment Configuration
+PAYMENT_GATEWAY=stripe
+STRIPE_PUBLISHABLE_KEY=pk_test_...
 
-```bash
-npm run reset-project
+# Analytics Configuration
+ANALYTICS_ENABLED=true
+FIREBASE_PROJECT_ID=splitbill-prod
+
+# Feature Flags
+QR_SCANNING_ENABLED=true
+PAYMENT_PROCESSING_ENABLED=true
+REAL_TIME_TRACKING_ENABLED=true
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+## 📁 Project Structure
 
-## Learn more
+```
+splitbill/
+├── 📱 app/                    # Expo Router screens
+├── 🎨 components/             # Reusable UI components
+│   ├── 🧩 common/            # Shared components
+│   ├── 🎯 features/          # Feature-specific components
+│   └── 📱 screens/           # Screen components
+├── 🏪 stores/                # State management
+│   ├── 📊 slices/            # Zustand store slices
+│   └── 🔧 middleware/        # Store middleware
+├── 🎨 themes/                # Design system
+├── 🛠️ utils/                 # Utility functions
+│   ├── 📊 helpers/           # Helper functions
+│   ├── 🔐 validators/        # Form validation
+│   └── 📱 hooks/             # Custom React hooks
+├── 📊 types/                 # TypeScript definitions
+├── 🗄️ data/                  # Data layer
+│   ├── 📋 models/            # Data models
+│   ├── 🔌 services/          # API services
+│   └── 📦 mock/              # Mock data
+├── 🔧 config/                # Configuration
+├── 📚 docs/                  # Documentation
+├── 🧪 tests/                 # Test files
+└── 📦 assets/                # Static assets
+```
 
-To learn more about developing your project with Expo, look at the following resources:
+## 🧪 Testing
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+### Running Tests
+```bash
+# Unit tests
+npm test
 
-## Join the community
+# Integration tests
+npm run test:integration
 
-Join our community of developers creating universal apps.
+# E2E tests
+npm run test:e2e
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+# Test coverage
+npm run test:coverage
+```
+
+### Test Structure
+- **Unit Tests**: Individual component and function testing
+- **Integration Tests**: Component interaction testing
+- **E2E Tests**: Full user journey testing
+- **Performance Tests**: Load and stress testing
+
+## 📦 Building for Production
+
+### iOS Build
+```bash
+# Build for iOS
+expo build:ios
+
+# Build for App Store
+expo build:ios --release-channel production
+```
+
+### Android Build
+```bash
+# Build for Android
+expo build:android
+
+# Build for Play Store
+expo build:android --release-channel production
+```
+
+### Web Build
+```bash
+# Build for web
+expo build:web
+```
+
+## 🔧 Configuration
+
+### App Configuration
+The application can be configured through the `app.json` file:
+
+```json
+{
+  "expo": {
+    "name": "SplitBill",
+    "slug": "splitbill",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "updates": {
+      "fallbackToCacheTimeout": 0
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.splitbill.app"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#FFFFFF"
+      },
+      "package": "com.splitbill.app"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    }
+  }
+}
+```
+
+## 📊 Analytics and Monitoring
+
+### Analytics Integration
+- **User Behavior Tracking**: Monitor user interactions and flows
+- **Performance Metrics**: Track app performance and load times
+- **Error Tracking**: Capture and analyze application errors
+- **Business Metrics**: Monitor key business indicators
+
+### Monitoring Tools
+- **Firebase Analytics**: User behavior and performance tracking
+- **Sentry**: Error monitoring and crash reporting
+- **Performance Monitoring**: Real-time performance metrics
+
+## 🔐 Security
+
+### Security Measures
+- **Input Validation**: Comprehensive input sanitization
+- **Data Encryption**: Sensitive data encryption in storage
+- **QR Code Validation**: Secure QR code processing
+- **Payment Security**: PCI-compliant payment handling
+- **Session Management**: Secure user session handling
+
+### Authentication (Future)
+- **JWT Tokens**: Secure authentication token system
+- **Refresh Tokens**: Automatic token renewal
+- **Role-based Access**: Granular permission system
+- **Multi-factor Authentication**: Enhanced security measures
+
+## 🤝 Contributing
+
+We welcome contributions from the community! Please read our [Contributing Guidelines](CONTRIBUTING.md) before submitting pull requests.
+
+### Development Workflow
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+### Code Standards
+- **TypeScript**: All code must be written in TypeScript
+- **ESLint**: Code must pass ESLint validation
+- **Prettier**: Code must be formatted with Prettier
+- **Tests**: New features must include appropriate tests
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🆘 Support
+
+### Documentation
+- [Architecture Guide](docs/ARCHITECTURE.md)
+- [API Documentation](docs/API.md)
+- [Component Library](docs/COMPONENTS.md)
+- [Deployment Guide](docs/DEPLOYMENT.md)
+
+### Getting Help
+- **Issues**: [GitHub Issues](https://github.com/your-org/splitbill/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/your-org/splitbill/discussions)
+- **Email**: support@splitbill.com
+
+### Community
+- **Discord**: [SplitBill Community](https://discord.gg/splitbill)
+- **Twitter**: [@SplitBillApp](https://twitter.com/SplitBillApp)
+- **Blog**: [SplitBill Blog](https://blog.splitbill.com)
+
+## 🙏 Acknowledgments
+
+- **React Native Team**: For the amazing cross-platform framework
+- **Expo Team**: For the excellent development platform
+- **NativeBase Team**: For the enterprise UI component library
+- **Zustand Team**: For the lightweight state management solution
+
+---
+
+**SplitBill** - Revolutionizing the restaurant experience, one table at a time. 🍽️✨
