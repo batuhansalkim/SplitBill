@@ -5,7 +5,7 @@ import React, { useState } from 'react';
 import { SplitButton } from '../components/common/Button/SplitButton';
 import { useCartStore } from '../stores/cartStore';
 import { useOrderStore } from '../stores/orderStore';
-import { useUserStore } from '../stores/userStore';
+import { useUserStore } from '../stores/slices/userSlice';
 
 type PaymentMethod = 'card' | 'mobile' | 'cash';
 
@@ -80,30 +80,34 @@ export default function PaymentScreen() {
 
   return (
     <Box flex={1} bg="gray.50" safeArea>
-      {/* Header */}
-      <Box bg="white" p={4} shadow={2}>
-        <HStack justifyContent="space-between" alignItems="center">
-          <Pressable onPress={handleBackToCart}>
-            <HStack space={2} alignItems="center">
-              <Icon
-                as={MaterialIcons}
-                name="arrow-back"
-                size="md"
-                color="gray.600"
-              />
-              <Text fontSize="lg" fontWeight="bold" color="gray.800">
-                Ödeme
-              </Text>
-            </HStack>
-          </Pressable>
-        </HStack>
-      </Box>
-
       {/* Scrollable Content */}
       <ScrollView flex={1} showsVerticalScrollIndicator={false}>
-        <VStack space={2} pb={4}>
+        <VStack space={2} pb={4} p={4}>
+          {/* Header */}
+          <Box bg="white" p={4} rounded="lg" shadow={1} mb={2}>
+            <HStack justifyContent="space-between" alignItems="center">
+              <Pressable onPress={handleBackToCart}>
+                <HStack space={2} alignItems="center">
+                  <Icon
+                    as={MaterialIcons}
+                    name="arrow-back"
+                    size="md"
+                    color="gray.600"
+                  />
+                  <Text fontSize="lg" fontWeight="bold" color="gray.800">
+                    Geri
+                  </Text>
+                </HStack>
+              </Pressable>
+              <Text fontSize="xl" fontWeight="bold" color="primary.500">
+                Ödeme
+              </Text>
+              <Box w={8} />
+            </HStack>
+          </Box>
+
           {/* Sipariş Özeti */}
-          <Box bg="white" p={4}>
+          <Box bg="white" p={4} rounded="lg" shadow={1}>
             <VStack space={3}>
               <Text fontSize="lg" fontWeight="bold" color="gray.800">
                 Sipariş Özeti
@@ -141,7 +145,7 @@ export default function PaymentScreen() {
           </Box>
 
           {/* Kupon Kodu */}
-          <Box bg="white" p={4}>
+          <Box bg="white" p={4} rounded="lg" shadow={1}>
             <VStack space={3}>
               <Text fontSize="md" fontWeight="semibold" color="gray.800">
                 Kupon Kodu
@@ -169,7 +173,7 @@ export default function PaymentScreen() {
           </Box>
 
           {/* Ödeme Yöntemi */}
-          <Box bg="white" p={4}>
+          <Box bg="white" p={4} rounded="lg" shadow={1}>
             <VStack space={4}>
               <Text fontSize="md" fontWeight="semibold" color="gray.800">
                 Ödeme Yöntemi
@@ -208,7 +212,7 @@ export default function PaymentScreen() {
 
           {/* Kart Bilgileri */}
           {paymentMethod === 'card' && (
-            <Box bg="white" p={4}>
+            <Box bg="white" p={4} rounded="lg" shadow={1}>
               <VStack space={4}>
                 <Text fontSize="md" fontWeight="semibold" color="gray.800">
                   Kart Bilgileri

@@ -1,6 +1,7 @@
 import { MaterialIcons } from '@expo/vector-icons';
-import { Avatar, Box, Button, HStack, Icon, Input, Modal, Pressable, ScrollView, Text, VStack } from 'native-base';
+import { Avatar, Box, Button, HStack, Icon, Input, Pressable, ScrollView, Text, VStack } from 'native-base';
 import React, { useState } from 'react';
+import { Modal, TouchableOpacity, View } from 'react-native';
 import { useGroupStore } from '../../stores/groupStore';
 
 export default function GroupSharingScreen() {
@@ -27,8 +28,18 @@ export default function GroupSharingScreen() {
     }
   };
 
+  // Modal'ı güvenli şekilde kapat
+  const closeAddUserModal = () => {
+    try {
+      setAddUserModal(false);
+      setNewUserName('');
+    } catch (error) {
+      console.log('Add user modal close error:', error);
+    }
+  };
+
   // Kişiyi ortak üründen çıkar/ekle
-  const toggleUserFromItem = (itemId, userId) => {
+  const toggleUserFromItem = (itemId: string, userId: string) => {
     const item = sharedItems.find(i => i.id === itemId);
     if (item?.sharedWith.includes(userId)) {
       removeUserFromSharedItem(itemId, userId);
@@ -146,11 +157,21 @@ export default function GroupSharingScreen() {
       )}
 
       {/* Kişi Ekleme Modalı */}
-      <Modal isOpen={addUserModal} onClose={() => setAddUserModal(false)}>
-        <Modal.Content maxWidth="400px">
-          <Modal.CloseButton />
-          <Modal.Header>Kişi Ekle</Modal.Header>
-          <Modal.Body>
+      <Modal
+        visible={addUserModal}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={closeAddUserModal}
+      >
+        <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center' }}>
+          <View style={{ backgroundColor: 'white', borderRadius: 12, padding: 20, width: '90%', maxWidth: 400 }}>
+            <HStack justifyContent="space-between" alignItems="center" mb={4}>
+              <Text fontSize="lg" fontWeight="bold">Kişi Ekle</Text>
+              <TouchableOpacity onPress={closeAddUserModal}>
+                <Icon as={MaterialIcons} name="close" size={6} color="gray.500" />
+              </TouchableOpacity>
+            </HStack>
+            
             <VStack space={4}>
               <Text>Masaya yeni kişi eklemek istiyor musunuz?</Text>
               <Input
@@ -163,13 +184,17 @@ export default function GroupSharingScreen() {
                 rounded="md"
               />
             </VStack>
-          </Modal.Body>
-          <Modal.Footer>
-            <Button colorScheme="primary" w="full" onPress={handleAddUser} isDisabled={!newUserName.trim()}>
-              Ekle
-            </Button>
-          </Modal.Footer>
-        </Modal.Content>
+            
+            <HStack space={3} mt={6}>
+              <Button flex={1} variant="outline" onPress={closeAddUserModal}>
+                İptal
+              </Button>
+              <Button flex={1} colorScheme="primary" onPress={handleAddUser} isDisabled={!newUserName.trim()}>
+                Ekle
+              </Button>
+            </HStack>
+          </View>
+        </View>
       </Modal>
     </Box>
   );

@@ -1,7 +1,9 @@
 import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { Badge, Box, Button, Checkbox, Divider, FlatList, HStack, Icon, Image, Modal, Pressable, Text, VStack } from 'native-base';
-import React, { useEffect, useState } from 'react';
+import { Badge, Box, Button, Divider, FlatList, HStack, Icon, Image, Pressable, Text, VStack } from 'native-base';
+import React, { useState } from 'react';
+import { Modal, ScrollView as RNScrollView, TouchableOpacity, View } from 'react-native';
+import { useCartStore } from '../../stores/cartStore';
 import { useGroupStore } from '../../stores/groupStore';
 import { useUserStore } from '../../stores/slices/userSlice';
 
@@ -24,18 +26,33 @@ export default function MenuScreen() {
   const router = useRouter();
   const { tableId, isConnected } = useUserStore();
   const { users, sharedItems, addSharedItem } = useGroupStore();
+  const { items, addToCart, removeFromCart, updateQuantity, totalAmount } = useCartStore();
   const [selectedCategory, setSelectedCategory] = useState(categories[0].id);
-  const [cart, setCart] = useState([]);
   const [cartOpen, setCartOpen] = useState(false);
   const [shareModal, setShareModal] = useState(false);
   const [shareProduct, setShareProduct] = useState(null);
   const [selectedUsers, setSelectedUsers] = useState([]);
 
-  useEffect(() => {
-    if (!isConnected || !tableId) router.push('/qr-scanner');
-  }, [isConnected, tableId]);
+  // Modal'ları güvenli şekilde kapat
+  const closeCartModal = () => {
+    try {
+      setCartOpen(false);
+    } catch (error) {
+      console.log('Cart modal close error:', error);
+    }
+  };
 
-  const handleAddToCart = (item) => setCart([...cart, { ...item, quantity: 1 }]);
+  const closeShareModal = () => {
+    try {
+      setShareModal(false);
+      setShareProduct(null);
+      setSelectedUsers([]);
+    } catch (error) {
+      console.log('Share modal close error:', error);
+    }
+  };
+
+  const handleAddToCart = (item) => addToCart(item);
 
   // Ortak ürün ekleme modalı açılır
   const handleOpenShareModal = (item) => {
@@ -54,20 +71,25 @@ export default function MenuScreen() {
     }
   };
 
-  const handleIncrease = (id) => {
-    setCart(items => items.map(i => i.id === id ? { ...i, quantity: i.quantity + 1 } : i));
+  const handleIncrease = (productId) => {
+    const item = items.find(i => i.product.id === productId);
+    if (item) {
+      updateQuantity(productId, item.quantity + 1);
+    }
   };
   
-  const handleDecrease = (id) => {
-    setCart(items => items.map(i => i.id === id && i.quantity > 1 ? { ...i, quantity: i.quantity - 1 } : i));
+  const handleDecrease = (productId) => {
+    const item = items.find(i => i.product.id === productId);
+    if (item && item.quantity > 1) {
+      updateQuantity(productId, item.quantity - 1);
+    }
   };
   
-  const handleRemove = (id) => {
-    setCart(items => items.filter(i => i.id !== id));
+  const handleRemove = (productId) => {
+    removeFromCart(productId);
   };
 
-  const total = cart.reduce((sum, i) => sum + i.price * i.quantity, 0) +
-    sharedItems.reduce((sum, i) => sum + (i.product.price * i.quantity) / (i.sharedWith.length || 1), 0);
+  const total = totalAmount + sharedItems.reduce((sum, i) => sum + (i.product.price * i.quantity) / (i.sharedWith.length || 1), 0);
 
   return (
     <Box flex={1} bg="gray.50" safeArea p={4}>
@@ -76,8 +98,8 @@ export default function MenuScreen() {
         <Pressable onPress={() => setCartOpen(true)}>
           <Box>
             <Icon as={MaterialIcons} name="shopping-cart" size={8} color="primary.500" />
-            {(cart.length > 0 || sharedItems.length > 0) && (
-              <Badge colorScheme="error" rounded="full" position="absolute" top={-2} right={-2} zIndex={1}>{cart.length + sharedItems.length}</Badge>
+            {(items.length > 0 || sharedItems.length > 0) && (
+              <Badge colorScheme="error" rounded="full" position="absolute" top={-2} right={-2} zIndex={1}>{items.length + sharedItems.length}</Badge>
             )}
           </Box>
         </Pressable>
@@ -95,6 +117,7 @@ export default function MenuScreen() {
           </Pressable>
         )}
         mb={4}
+        contentContainerStyle={{ paddingBottom: 0 }}
       />
       <FlatList
         data={products.filter(p => p.category === selectedCategory)}
@@ -114,103 +137,149 @@ export default function MenuScreen() {
             </HStack>
           </Box>
         )}
+        contentContainerStyle={{ paddingBottom: 0 }}
       />
       {/* Ortak ürün kullanıcı seçimi modalı */}
-      <Modal isOpen={shareModal} onClose={() => setShareModal(false)}>
-        <Modal.Content maxWidth="400px">
-          <Modal.CloseButton />
-          <Modal.Header>Ortak Siparişe Ekle</Modal.Header>
-          <Modal.Body>
-            <Text mb={2}>Bu ürünü kimlerle paylaşmak istiyorsun?</Text>
-            <Checkbox.Group
-              value={selectedUsers}
-              onChange={setSelectedUsers}
-              accessibilityLabel="Kullanıcı seçimi"
-            >
-              <VStack space={2}>
-                {users.filter(user => user.isActive).map(u => (
-                  <Checkbox value={u.id} key={u.id}>{u.name}</Checkbox>
-                ))}
-              </VStack>
-            </Checkbox.Group>
-          </Modal.Body>
-          <Modal.Footer>
-            <Button colorScheme="primary" w="full" isDisabled={selectedUsers.length < 2} onPress={handleAddToShared}>
-              Ekle
-            </Button>
-          </Modal.Footer>
-        </Modal.Content>
-      </Modal>
-      {/* Sepet modalı */}
-      <Modal isOpen={cartOpen} onClose={() => setCartOpen(false)} size="full">
-        <Modal.Content maxWidth="400px">
-          <Modal.CloseButton />
-          <Modal.Header>Sepetim</Modal.Header>
-          <Modal.Body>
-            <VStack space={4}>
-              {cart.length === 0 && sharedItems.length === 0 && (
-                <Text color="gray.400" textAlign="center">Sepetiniz boş</Text>
-              )}
-              {cart.length > 0 && (
-                <>
-                  <Text fontWeight="semibold" color="gray.700">Ürünler</Text>
-                  {cart.map(item => (
-                    <Box key={item.id} bg="gray.50" p={3} rounded="md" mb={2}>
-                      <HStack justifyContent="space-between" alignItems="center">
-                        <VStack>
-                          <Text fontWeight="semibold">{item.name}</Text>
-                          <Text color="primary.500">₺{item.price} x {item.quantity}</Text>
-                        </VStack>
-                        <HStack space={2} alignItems="center">
-                          <Pressable onPress={() => handleDecrease(item.id)}>
-                            <Icon as={MaterialIcons} name="remove-circle-outline" size={5} color="primary.500" />
-                          </Pressable>
-                          <Text fontWeight="bold">{item.quantity}</Text>
-                          <Pressable onPress={() => handleIncrease(item.id)}>
-                            <Icon as={MaterialIcons} name="add-circle-outline" size={5} color="primary.500" />
-                          </Pressable>
-                          <Pressable onPress={() => handleRemove(item.id)}>
-                            <Icon as={MaterialIcons} name="cancel" size={5} color="error.500" />
-                          </Pressable>
-                        </HStack>
-                      </HStack>
-                    </Box>
-                  ))}
-                </>
-              )}
-              {sharedItems.length > 0 && (
-                <>
-                  <Divider my={2} />
-                  <Text fontWeight="semibold" color="gray.700">Ortak Ürünler</Text>
-                  {sharedItems.map(item => (
-                    <Box key={item.id} bg="blue.50" p={3} rounded="md" mb={2}>
-                      <HStack justifyContent="space-between" alignItems="center">
-                        <VStack>
-                          <Text fontWeight="semibold">{item.product.name}</Text>
-                          <Text color="primary.500">₺{item.product.price} x {item.quantity}</Text>
-                          <Text fontSize="xs" color="blue.700">{item.sharedWith.length} kişiyle paylaşılıyor</Text>
-                          <Text fontSize="xs" color="blue.700">Kişi başı: ₺{((item.product.price * item.quantity) / item.sharedWith.length).toFixed(2)}</Text>
-                          <Text fontSize="xs" color="blue.700">Paylaşanlar: {users.filter(u => item.sharedWith.includes(u.id)).map(u => u.name).join(', ')}</Text>
-                        </VStack>
-                      </HStack>
-                    </Box>
-                  ))}
-                </>
-              )}
+      <Modal
+        visible={shareModal}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={closeShareModal}
+      >
+        <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center' }}>
+          <View style={{ backgroundColor: 'white', borderRadius: 12, padding: 20, width: '90%', maxWidth: 400 }}>
+            <HStack justifyContent="space-between" alignItems="center" mb={4}>
+              <Text fontSize="lg" fontWeight="bold">Ortak Siparişe Ekle</Text>
+              <TouchableOpacity onPress={closeShareModal}>
+                <Icon as={MaterialIcons} name="close" size={6} color="gray.500" />
+              </TouchableOpacity>
+            </HStack>
+            
+            <Text mb={4}>Bu ürünü kimlerle paylaşmak istiyorsun?</Text>
+            
+            <VStack space={3}>
+              {users.filter(user => user.isActive).map(u => (
+                <TouchableOpacity
+                  key={u.id}
+                  onPress={() => {
+                    if (selectedUsers.includes(u.id)) {
+                      setSelectedUsers(selectedUsers.filter(id => id !== u.id));
+                    } else {
+                      setSelectedUsers([...selectedUsers, u.id]);
+                    }
+                  }}
+                >
+                  <HStack space={3} alignItems="center" p={3} bg={selectedUsers.includes(u.id) ? "blue.50" : "gray.50"} rounded="md">
+                    <Icon 
+                      as={MaterialIcons} 
+                      name={selectedUsers.includes(u.id) ? "check-circle" : "radio-button-unchecked"} 
+                      size={5} 
+                      color={selectedUsers.includes(u.id) ? "blue.500" : "gray.400"} 
+                    />
+                    <Text color={selectedUsers.includes(u.id) ? "blue.700" : "gray.700"} fontWeight={selectedUsers.includes(u.id) ? "semibold" : "normal"}>
+                      {u.name}
+                    </Text>
+                  </HStack>
+                </TouchableOpacity>
+              ))}
             </VStack>
-          </Modal.Body>
-          <Modal.Footer>
-            <VStack w="full" space={2}>
+            
+            <HStack space={3} mt={6}>
+              <Button flex={1} variant="outline" onPress={closeShareModal}>
+                İptal
+              </Button>
+              <Button flex={1} colorScheme="primary" isDisabled={selectedUsers.length < 2} onPress={handleAddToShared}>
+                Ekle
+              </Button>
+            </HStack>
+          </View>
+        </View>
+      </Modal>
+      
+      {/* Sepet modalı */}
+      <Modal
+        visible={cartOpen}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={closeCartModal}
+      >
+        <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center' }}>
+          <View style={{ backgroundColor: 'white', borderRadius: 12, padding: 20, width: '95%', maxWidth: 400, maxHeight: '80%' }}>
+            <HStack justifyContent="space-between" alignItems="center" mb={4}>
+              <Text fontSize="lg" fontWeight="bold">Sepetim</Text>
+              <TouchableOpacity onPress={closeCartModal}>
+                <Icon as={MaterialIcons} name="close" size={6} color="gray.500" />
+              </TouchableOpacity>
+            </HStack>
+            
+            <RNScrollView showsVerticalScrollIndicator={false} style={{ maxHeight: 400 }}>
+              <VStack space={4}>
+                {items.length === 0 && sharedItems.length === 0 && (
+                  <Text color="gray.400" textAlign="center">Sepetiniz boş</Text>
+                )}
+                {items.length > 0 && (
+                  <>
+                    <Text fontWeight="semibold" color="gray.700">Ürünler</Text>
+                    {items.map(item => (
+                      <Box key={item.product.id} bg="gray.50" p={3} rounded="md" mb={2}>
+                        <HStack justifyContent="space-between" alignItems="center">
+                          <VStack>
+                            <Text fontWeight="semibold">{item.product.name}</Text>
+                            <Text color="primary.500">₺{item.product.price} x {item.quantity}</Text>
+                          </VStack>
+                          <HStack space={2} alignItems="center">
+                            <Pressable onPress={() => handleDecrease(item.product.id)}>
+                              <Icon as={MaterialIcons} name="remove-circle-outline" size={5} color="primary.500" />
+                            </Pressable>
+                            <Text fontWeight="bold">{item.quantity}</Text>
+                            <Pressable onPress={() => handleIncrease(item.product.id)}>
+                              <Icon as={MaterialIcons} name="add-circle-outline" size={5} color="primary.500" />
+                            </Pressable>
+                            <Pressable onPress={() => handleRemove(item.product.id)}>
+                              <Icon as={MaterialIcons} name="cancel" size={5} color="error.500" />
+                            </Pressable>
+                          </HStack>
+                        </HStack>
+                      </Box>
+                    ))}
+                  </>
+                )}
+                {sharedItems.length > 0 && (
+                  <>
+                    <Divider my={2} />
+                    <Text fontWeight="semibold" color="gray.700">Ortak Ürünler</Text>
+                    {sharedItems.map(item => (
+                      <Box key={item.id} bg="blue.50" p={3} rounded="md" mb={2}>
+                        <HStack justifyContent="space-between" alignItems="center">
+                          <VStack>
+                            <Text fontWeight="semibold">{item.product.name}</Text>
+                            <Text color="primary.500">₺{item.product.price} x {item.quantity}</Text>
+                            <Text fontSize="xs" color="blue.700">{item.sharedWith.length} kişiyle paylaşılıyor</Text>
+                            <Text fontSize="xs" color="blue.700">Kişi başı: ₺{((item.product.price * item.quantity) / item.sharedWith.length).toFixed(2)}</Text>
+                            <Text fontSize="xs" color="blue.700">Paylaşanlar: {users.filter(u => item.sharedWith.includes(u.id)).map(u => u.name).join(', ')}</Text>
+                          </VStack>
+                        </HStack>
+                      </Box>
+                    ))}
+                  </>
+                )}
+              </VStack>
+            </RNScrollView>
+            
+            <VStack w="full" space={3} mt={4}>
               <HStack justifyContent="space-between" alignItems="center">
                 <Text fontWeight="bold">Toplam:</Text>
                 <Text fontWeight="bold" color="primary.700">₺{total.toFixed(2)}</Text>
               </HStack>
-              <Button colorScheme="primary" w="full" isDisabled={cart.length === 0 && sharedItems.length === 0} onPress={() => { setCartOpen(false); alert('Ödeme ekranı yakında!'); }}>
+              <Button colorScheme="primary" w="full" isDisabled={items.length === 0 && sharedItems.length === 0} onPress={() => { 
+                closeCartModal(); 
+                router.push('/payment'); 
+              }}>
                 Ödeme Yap
               </Button>
             </VStack>
-          </Modal.Footer>
-        </Modal.Content>
+          </View>
+        </View>
       </Modal>
     </Box>
   );

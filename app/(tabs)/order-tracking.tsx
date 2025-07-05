@@ -1,34 +1,64 @@
 import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { Box, Button, Divider, HStack, Icon, Pressable, ScrollView, Text, VStack } from 'native-base';
-import React, { useEffect, useState } from 'react';
+import { Box, Divider, HStack, Icon, ScrollView, Text, VStack } from 'native-base';
+import React from 'react';
+import { useOrderStore } from '../../stores/orderStore';
 import { useUserStore } from '../../stores/slices/userSlice';
 
-// Demo sipariş verisi (local state)
-const initialOrders = [
-  { id: 'ORD-1234', name: 'Mercimek Çorbası', quantity: 1, status: 'Hazırlanıyor' },
-  { id: 'ORD-1235', name: 'Köfte', quantity: 2, status: 'Hazırlanıyor' },
+// Demo sipariş verisi
+const demoOrders = [
+  {
+    id: 'ORD-1234',
+    status: 'preparing',
+    statusText: 'Hazırlanıyor',
+    date: '2024-05-20',
+    time: '14:30',
+    total: 200,
+    items: [
+      { id: '101', name: 'Köfte', quantity: 2, price: 120 },
+      { id: '201', name: 'Baklava', quantity: 1, price: 50 },
+    ],
+    estimatedTime: 15, // dakika
+  },
+  {
+    id: 'ORD-1235',
+    status: 'confirmed',
+    statusText: 'Sipariş Onaylandı',
+    date: '2024-05-20',
+    time: '14:25',
+    total: 180,
+    items: [
+      { id: '102', name: 'Tavuk Şiş', quantity: 1, price: 130 },
+      { id: '301', name: 'Ayran', quantity: 1, price: 20 },
+    ],
+    estimatedTime: 20,
+  },
 ];
 
-const activeOrder = {
-  id: 'ORD-1234',
-  status: 'Hazırlanıyor',
-  date: '2024-05-20',
-  total: 200,
-  items: [
-    { id: '101', name: 'Köfte', quantity: 2 },
-    { id: '201', name: 'Baklava', quantity: 1 },
-  ],
-};
 const pastOrders = [
   {
     id: 'ORD-1222',
-    status: 'Teslim Edildi',
+    status: 'delivered',
+    statusText: 'Teslim Edildi',
     date: '2024-05-18',
+    time: '19:45',
     total: 180,
     items: [
-      { id: '102', name: 'Tavuk Şiş', quantity: 1 },
-      { id: '202', name: 'Sütlaç', quantity: 2 },
+      { id: '102', name: 'Tavuk Şiş', quantity: 1, price: 130 },
+      { id: '202', name: 'Sütlaç', quantity: 2, price: 45 },
+    ],
+  },
+  {
+    id: 'ORD-1221',
+    status: 'delivered',
+    statusText: 'Teslim Edildi',
+    date: '2024-05-17',
+    time: '20:15',
+    total: 250,
+    items: [
+      { id: '101', name: 'Köfte', quantity: 2, price: 120 },
+      { id: '201', name: 'Baklava', quantity: 1, price: 50 },
+      { id: '302', name: 'Kola', quantity: 1, price: 30 },
     ],
   },
 ];
@@ -36,82 +66,149 @@ const pastOrders = [
 export default function OrderTrackingScreen() {
   const router = useRouter();
   const { tableId, isConnected } = useUserStore();
-  const [orders, setOrders] = useState(initialOrders);
-  const [order, setOrder] = useState(activeOrder);
-  const [history, setHistory] = useState(pastOrders);
+  const { currentOrder } = useOrderStore();
 
-  useEffect(() => {
-    if (!isConnected || !tableId) router.push('/qr-scanner');
-  }, [isConnected, tableId]);
+  // Aktif siparişleri filtrele
+  const activeOrders = demoOrders.filter(order => 
+    ['pending', 'confirmed', 'preparing', 'ready'].includes(order.status)
+  );
 
-  const handleIncrease = (id: string) => {
-    setOrders(orders => orders.map(o => o.id === id ? { ...o, quantity: o.quantity + 1 } : o));
-    setOrder(o => ({ ...o, items: o.items.map(i => i.id === id ? { ...i, quantity: i.quantity + 1 } : i) }));
+  // Sipariş durumu ikonunu getir
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case 'pending':
+        return 'schedule';
+      case 'confirmed':
+        return 'check-circle';
+      case 'preparing':
+        return 'restaurant';
+      case 'ready':
+        return 'local-shipping';
+      case 'delivered':
+        return 'done';
+      default:
+        return 'info';
+    }
   };
-  const handleDecrease = (id: string) => {
-    setOrders(orders => orders.map(o => o.id === id && o.quantity > 1 ? { ...o, quantity: o.quantity - 1 } : o));
-    setOrder(o => ({ ...o, items: o.items.map(i => i.id === id && i.quantity > 1 ? { ...i, quantity: i.quantity - 1 } : i) }));
-  };
-  const handleCancel = (id: string) => {
-    setOrders(orders => orders.filter(o => o.id !== id));
-    setOrder(o => ({ ...o, items: o.items.filter(i => i.id !== id) }));
+
+  // Sipariş durumu rengini getir
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'pending':
+        return 'orange.500';
+      case 'confirmed':
+        return 'blue.500';
+      case 'preparing':
+        return 'yellow.500';
+      case 'ready':
+        return 'green.500';
+      case 'delivered':
+        return 'gray.500';
+      default:
+        return 'gray.500';
+    }
   };
 
   return (
-    <Box flex={1} bg="gray.50" safeArea p={4}>
-      <Text fontSize="2xl" fontWeight="bold" color="primary.500" mb={4}>Siparişler</Text>
-      <Box bg="white" p={4} rounded="lg" shadow={1} mb={4}>
-        <Text fontWeight="semibold" color="gray.800">Aktif Sipariş</Text>
-        <Text color="primary.500" fontWeight="bold" mb={2}>Durum: {order.status}</Text>
-        <Text color="gray.500" fontSize="sm">Tarih: {order.date}</Text>
-        <VStack space={2} mt={2}>
-          {order.items.map(item => (
-            <HStack key={item.id} justifyContent="space-between" alignItems="center">
-              <Text>{item.name} x{item.quantity}</Text>
-              <HStack space={1} alignItems="center">
-                <Pressable onPress={() => handleDecrease(item.id)}>
-                  <Icon as={MaterialIcons} name="remove-circle-outline" size={5} color="primary.500" />
-                </Pressable>
-                <Pressable onPress={() => handleIncrease(item.id)}>
-                  <Icon as={MaterialIcons} name="add-circle-outline" size={5} color="primary.500" />
-                </Pressable>
-                <Pressable onPress={() => handleCancel(item.id)}>
-                  <Icon as={MaterialIcons} name="cancel" size={5} color="error.500" />
-                </Pressable>
-              </HStack>
-            </HStack>
-          ))}
-        </VStack>
-        <Divider my={2} />
-        <Text fontWeight="bold" color="primary.700">Toplam: ₺{order.total}</Text>
-      </Box>
-      <Text fontWeight="semibold" color="gray.700" mb={2}>Geçmiş Siparişler</Text>
-      <ScrollView>
-        <VStack space={4}>
-          {history.length === 0 ? (
-            <Text color="gray.400" textAlign="center">Geçmiş sipariş yok.</Text>
-          ) : (
-            history.map(po => (
-              <Box key={po.id} bg="white" p={4} rounded="lg" shadow={1}>
-                <Text fontWeight="semibold" color="gray.800">Sipariş No: {po.id}</Text>
-                <Text color="gray.500" fontSize="sm">Tarih: {po.date}</Text>
-                <Text color="primary.500" fontWeight="bold">Durum: {po.status}</Text>
-                <VStack space={1} mt={2}>
-                  {po.items.map(item => (
-                    <Text key={item.id} color="gray.700">{item.name} x{item.quantity}</Text>
+    <Box flex={1} bg="gray.50" safeArea>
+      <ScrollView flex={1} showsVerticalScrollIndicator={false} p={4}>
+        <Text fontSize="2xl" fontWeight="bold" color="primary.500" mb={4}>Siparişlerim</Text>
+        
+        {/* Aktif Siparişler */}
+        {activeOrders.length > 0 && (
+          <VStack space={4} mb={6}>
+            <Text fontSize="lg" fontWeight="semibold" color="gray.800">Aktif Siparişler</Text>
+            {activeOrders.map(order => (
+              <Box key={order.id} bg="white" p={4} rounded="lg" shadow={1}>
+                <HStack justifyContent="space-between" alignItems="center" mb={3}>
+                  <VStack>
+                    <Text fontWeight="semibold" color="gray.800">Sipariş #{order.id}</Text>
+                    <Text color="gray.500" fontSize="sm">{order.date} - {order.time}</Text>
+                  </VStack>
+                  <HStack space={2} alignItems="center">
+                    <Icon 
+                      as={MaterialIcons} 
+                      name={getStatusIcon(order.status)} 
+                      size="md" 
+                      color={getStatusColor(order.status)} 
+                    />
+                    <Text fontWeight="bold" color={getStatusColor(order.status)}>
+                      {order.statusText}
+                    </Text>
+                  </HStack>
+                </HStack>
+                
+                <VStack space={2} mb={3}>
+                  {order.items.map(item => (
+                    <HStack key={item.id} justifyContent="space-between" alignItems="center">
+                      <Text color="gray.700">{item.name} x{item.quantity}</Text>
+                      <Text color="gray.600">₺{item.price * item.quantity}</Text>
+                    </HStack>
                   ))}
                 </VStack>
-                <Text fontWeight="bold" color="primary.700" mt={2}>Toplam: ₺{po.total}</Text>
+                
+                <Divider mb={3} />
+                
+                <HStack justifyContent="space-between" alignItems="center">
+                  <VStack>
+                    <Text fontWeight="bold" color="primary.700">Toplam: ₺{order.total}</Text>
+                    {order.estimatedTime && (
+                      <Text fontSize="sm" color="gray.600">
+                        Tahmini süre: {order.estimatedTime} dakika
+                      </Text>
+                    )}
+                  </VStack>
+                </HStack>
               </Box>
-            ))
-          )}
+            ))}
+          </VStack>
+        )}
+
+        {/* Geçmiş Siparişler */}
+        <VStack space={4} pb={4}>
+          <Text fontSize="lg" fontWeight="semibold" color="gray.800">Geçmiş Siparişler</Text>
+          <VStack space={4}>
+            {pastOrders.length === 0 ? (
+              <Text color="gray.400" textAlign="center">Geçmiş sipariş bulunmuyor.</Text>
+            ) : (
+              pastOrders.map(order => (
+                <Box key={order.id} bg="white" p={4} rounded="lg" shadow={1}>
+                  <HStack justifyContent="space-between" alignItems="center" mb={3}>
+                    <VStack>
+                      <Text fontWeight="semibold" color="gray.800">Sipariş #{order.id}</Text>
+                      <Text color="gray.500" fontSize="sm">{order.date} - {order.time}</Text>
+                    </VStack>
+                    <HStack space={2} alignItems="center">
+                      <Icon 
+                        as={MaterialIcons} 
+                        name={getStatusIcon(order.status)} 
+                        size="md" 
+                        color={getStatusColor(order.status)} 
+                      />
+                      <Text fontWeight="bold" color={getStatusColor(order.status)}>
+                        {order.statusText}
+                      </Text>
+                    </HStack>
+                  </HStack>
+                  
+                  <VStack space={2} mb={3}>
+                    {order.items.map(item => (
+                      <HStack key={item.id} justifyContent="space-between" alignItems="center">
+                        <Text color="gray.700">{item.name} x{item.quantity}</Text>
+                        <Text color="gray.600">₺{item.price * item.quantity}</Text>
+                      </HStack>
+                    ))}
+                  </VStack>
+                  
+                  <Divider mb={3} />
+                  
+                  <Text fontWeight="bold" color="primary.700">Toplam: ₺{order.total}</Text>
+                </Box>
+              ))
+            )}
+          </VStack>
         </VStack>
       </ScrollView>
-      {orders.length > 0 && (
-        <Button colorScheme="primary" w="full" size="lg" mt={6} onPress={() => router.push('/payment')}>
-          Ödemeye Geç
-        </Button>
-      )}
     </Box>
   );
 } 
