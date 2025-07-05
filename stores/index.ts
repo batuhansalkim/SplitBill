@@ -19,3 +19,8 @@ export type { CartItem, CartState } from './slices/cartSlice';
 // Order Management
 export { useOrderStore } from './slices/orderSlice';
 export type { Order, OrderState, OrderStatus } from './slices/orderSlice';
+
+// Group Management
+export { useGroupStore } from './groupStore';
+export type { GroupState, GroupUser, SharedItem } from './groupStore';
+

@@ -46,8 +46,36 @@ export default function HomeScreen() {
             </VStack>
           </VStack>
 
+          {/* Bağlantı Durumu */}
+          {isConnected && tableId ? (
+            <VStack space={2} alignItems="center" bg="primary.50" p={4} rounded="lg" mt={2}>
+              <Icon as={MaterialIcons} name="check-circle" size={8} color="primary.500" mb={1} />
+              <Text fontSize="lg" fontWeight="semibold" color="primary.700">
+                Masaya bağlısınız
+              </Text>
+              <Text fontSize="md" color="gray.700">
+                Masa: <Text fontWeight="bold" color="primary.700">{tableId}</Text>
+              </Text>
+            </VStack>
+          ) : (
+            <VStack space={4}>
+              <SplitButton
+                size="lg"
+                onPress={handleStartScanning}
+              >
+                <HStack space={2} alignItems="center">
+                  <Icon as={MaterialIcons} name="qr-code-scanner" size="md" />
+                  <Text>Masaya Katıl</Text>
+                </HStack>
+              </SplitButton>
+              <Text fontSize="sm" color="gray.500" textAlign="center">
+                Masadaki QR kodu okutarak başlayın
+              </Text>
+            </VStack>
+          )}
+
           {/* Özellikler */}
-          <VStack space={4}>
+          <VStack space={4} mt={4}>
             <HStack space={3} alignItems="center">
               <Box
                 w={8}
@@ -110,23 +138,6 @@ export default function HomeScreen() {
                 Kendi hesabınızı ödeyin
               </Text>
             </HStack>
-          </VStack>
-
-          {/* Başla Butonu */}
-          <VStack space={4}>
-            <SplitButton
-              size="lg"
-              onPress={handleStartScanning}
-            >
-              <HStack space={2} alignItems="center">
-                <Icon as={MaterialIcons} name="qr-code-scanner" size="md" />
-                <Text>Masaya Katıl</Text>
-              </HStack>
-            </SplitButton>
-
-            <Text fontSize="sm" color="gray.500" textAlign="center">
-              Masadaki QR kodu okutarak başlayın
-            </Text>
           </VStack>
         </VStack>
       </ScrollView>

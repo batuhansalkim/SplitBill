@@ -5,8 +5,13 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.8.3-blue.svg)](https://www.typescriptlang.org/)
 [![NativeBase](https://img.shields.io/badge/NativeBase-3.0.0-purple.svg)](https://nativebase.io/)
 [![Zustand](https://img.shields.io/badge/Zustand-4.0.0-orange.svg)](https://zustand-demo.pmnd.rs/)
+[![License](https://img.shields.io/badge/License-Proprietary-red.svg)](LICENSE)
 
 > **SplitBill** is an enterprise-grade restaurant management application designed to revolutionize the dining experience through intelligent QR-based ordering, seamless payment processing, and real-time order tracking.
+
+**© 2025 Batuhan Salkım. All rights reserved.**  
+This project has been completely developed and coded by Batuhan Salkım.  
+All code, design, and intellectual property rights belong 100% to Batuhan Salkım.
 
 ## 🎯 Overview
 
@@ -274,34 +279,52 @@ The application can be configured through the `app.json` file:
 
 ## 🤝 Contributing
 
-We welcome contributions from the community! Please read our [Contributing Guidelines](CONTRIBUTING.md) before submitting pull requests.
+**This is proprietary software. No contributions are accepted from the community.**
 
-### Development Workflow
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+This project is the exclusive property of Batuhan Salkım. All development, modifications, and improvements are handled internally by the copyright holder.
 
-### Code Standards
-- **TypeScript**: All code must be written in TypeScript
-- **ESLint**: Code must pass ESLint validation
-- **Prettier**: Code must be formatted with Prettier
-- **Tests**: New features must include appropriate tests
+### Development Information
+- **TypeScript**: All code is written in TypeScript
+- **ESLint**: Code follows strict ESLint validation
+- **Prettier**: Code is formatted with Prettier
+- **Tests**: Comprehensive testing is implemented
+
+### Collaboration
+For collaboration opportunities, licensing inquiries, or custom development requests, please contact:
+- **Email**: [Contact information to be added]
+- **GitHub**: [GitHub profile to be added]
+- **LinkedIn**: [LinkedIn profile to be added]
 
 ## 📄 License
 
-**Proprietary Software - All Rights Reserved**
+**PROPRIETARY SOFTWARE - ALL RIGHTS RESERVED**
 
-Copyright (c) 2025 Batuhan Salkım. All rights reserved.
+**Copyright (c) 2025 Batuhan Salkım. All rights reserved.**
 
-This software is proprietary and confidential. Unauthorized copying, distribution, or use is strictly prohibited.
+This project (SplitBill) is the original work of the author and subject to copyright protection.
+First published on: July 5, 2025
+
+This project has been completely developed and coded by Batuhan Salkım.
+All code, design, and intellectual property rights belong 100% to Batuhan Salkım.
+
+### ⚠️ IMPORTANT: UNAUTHORIZED USE IS STRICTLY PROHIBITED
+
+**This software is proprietary and confidential. Unauthorized use, copying, distribution, modification, or reproduction of this software is strictly prohibited without express written permission from the copyright holder.**
+
+### License Terms
+- **Proprietary Software**: All rights reserved, no open source license
+- **Copyright Protection**: All rights reserved to Batuhan Salkım
+- **Original Work**: This is the author's original creation
+- **Unauthorized Use Prohibited**: Any use without permission is illegal
+- **Commercial Use**: Strictly prohibited without licensing
+- **Educational Use**: Strictly prohibited without licensing
+- **Personal Use**: Strictly prohibited without licensing
 
 ### Commercial Licensing
 For licensing inquiries and commercial use, please contact:
-- **Email**: batuhan@salkim.com
-- **LinkedIn**: [Batuhan Salkım](https://linkedin.com/in/batuhansalkim)
-- **Pricing**: Available upon request
+- **Email**: [Contact information to be added]
+- **GitHub**: [GitHub profile to be added]
+- **LinkedIn**: [LinkedIn profile to be added]
 
 ### Available Packages
 
@@ -318,6 +341,9 @@ For licensing inquiries and commercial use, please contact:
 - ✅ Customization support
 - ✅ Training materials
 - ✅ 1 year of updates
+
+### Legal Notice
+This software is protected by copyright laws and international treaties. Unauthorized reproduction or distribution of this software, or any portion of it, may result in severe civil and criminal penalties, and will be prosecuted to the maximum extent possible under the law.
 
 ## 🆘 Support
 

@@ -1,8 +1,11 @@
 {
   "expo": {
-    "name": "splitbill",
+    "name": "SplitBill",
     "slug": "splitbill",
     "version": "1.0.0",
+    "description": "Enterprise-grade restaurant management application",
+    "author": "Batuhan Salkım",
+    "copyright": "© 2025 Batuhan Salkım. All rights reserved.",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "splitbill",

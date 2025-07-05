@@ -2,6 +2,26 @@
   "name": "splitbill",
   "main": "expo-router/entry",
   "version": "1.0.0",
+  "description": "Enterprise-grade restaurant management application with intelligent QR-based ordering, seamless payment processing, and real-time order tracking",
+  "author": "Batuhan Salkım <batuhan@salkim.com>",
+  "license": "Proprietary",
+  "copyright": "© 2025 Batuhan Salkım. All rights reserved.",
+  "homepage": "https://github.com/batuhansalkim/splitbill",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/batuhansalkim/splitbill.git"
+  },
+  "keywords": [
+    "restaurant",
+    "management",
+    "qr-code",
+    "payment",
+    "react-native",
+    "expo",
+    "typescript",
+    "nativebase",
+    "zustand"
+  ],
   "scripts": {
     "start": "expo start",
     "reset-project": "node ./scripts/reset-project.js",
