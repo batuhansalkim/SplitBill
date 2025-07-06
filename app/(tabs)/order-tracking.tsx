@@ -1,6 +1,6 @@
 import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { Box, Divider, HStack, Icon, ScrollView, Text, VStack } from 'native-base';
+import { Box, HStack, Icon, ScrollView, Text, VStack } from 'native-base';
 import React from 'react';
 import { useOrderStore } from '../../stores/orderStore';
 import { useUserStore } from '../../stores/slices/userSlice';
@@ -18,7 +18,7 @@ const demoOrders = [
       { id: '101', name: 'Köfte', quantity: 2, price: 120 },
       { id: '201', name: 'Baklava', quantity: 1, price: 50 },
     ],
-    estimatedTime: 15, // dakika
+    estimatedTime: 15,
   },
   {
     id: 'ORD-1235',
@@ -63,151 +63,215 @@ const pastOrders = [
   },
 ];
 
+const getStatusConfig = (status: string) => {
+  switch (status) {
+    case 'pending':
+      return { color: '#f59e0b', bg: '#fef3c7', icon: 'schedule' };
+    case 'confirmed':
+      return { color: '#3b82f6', bg: '#dbeafe', icon: 'check-circle' };
+    case 'preparing':
+      return { color: '#f59e0b', bg: '#fef3c7', icon: 'restaurant' };
+    case 'ready':
+      return { color: '#10b981', bg: '#d1fae5', icon: 'local-shipping' };
+    case 'delivered':
+      return { color: '#6b7280', bg: '#f3f4f6', icon: 'done' };
+    default:
+      return { color: '#6b7280', bg: '#f3f4f6', icon: 'info' };
+  }
+};
+
 export default function OrderTrackingScreen() {
   const router = useRouter();
   const { tableId, isConnected } = useUserStore();
   const { currentOrder } = useOrderStore();
 
-  // Aktif siparişleri filtrele
   const activeOrders = demoOrders.filter(order => 
     ['pending', 'confirmed', 'preparing', 'ready'].includes(order.status)
   );
 
-  // Sipariş durumu ikonunu getir
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'pending':
-        return 'schedule';
-      case 'confirmed':
-        return 'check-circle';
-      case 'preparing':
-        return 'restaurant';
-      case 'ready':
-        return 'local-shipping';
-      case 'delivered':
-        return 'done';
-      default:
-        return 'info';
-    }
-  };
-
-  // Sipariş durumu rengini getir
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'pending':
-        return 'orange.500';
-      case 'confirmed':
-        return 'blue.500';
-      case 'preparing':
-        return 'yellow.500';
-      case 'ready':
-        return 'green.500';
-      case 'delivered':
-        return 'gray.500';
-      default:
-        return 'gray.500';
-    }
-  };
-
   return (
-    <Box flex={1} bg="gray.50" safeArea>
-      <ScrollView flex={1} showsVerticalScrollIndicator={false} p={4}>
-        <Text fontSize="2xl" fontWeight="bold" color="primary.500" mb={4}>Siparişlerim</Text>
-        
-        {/* Aktif Siparişler */}
-        {activeOrders.length > 0 && (
-          <VStack space={4} mb={6}>
-            <Text fontSize="lg" fontWeight="semibold" color="gray.800">Aktif Siparişler</Text>
-            {activeOrders.map(order => (
-              <Box key={order.id} bg="white" p={4} rounded="lg" shadow={1}>
-                <HStack justifyContent="space-between" alignItems="center" mb={3}>
-                  <VStack>
-                    <Text fontWeight="semibold" color="gray.800">Sipariş #{order.id}</Text>
-                    <Text color="gray.500" fontSize="sm">{order.date} - {order.time}</Text>
-                  </VStack>
-                  <HStack space={2} alignItems="center">
-                    <Icon 
-                      as={MaterialIcons} 
-                      name={getStatusIcon(order.status)} 
-                      size="md" 
-                      color={getStatusColor(order.status)} 
-                    />
-                    <Text fontWeight="bold" color={getStatusColor(order.status)}>
-                      {order.statusText}
-                    </Text>
-                  </HStack>
-                </HStack>
-                
-                <VStack space={2} mb={3}>
-                  {order.items.map(item => (
-                    <HStack key={item.id} justifyContent="space-between" alignItems="center">
-                      <Text color="gray.700">{item.name} x{item.quantity}</Text>
-                      <Text color="gray.600">₺{item.price * item.quantity}</Text>
-                    </HStack>
-                  ))}
-                </VStack>
-                
-                <Divider mb={3} />
-                
-                <HStack justifyContent="space-between" alignItems="center">
-                  <VStack>
-                    <Text fontWeight="bold" color="primary.700">Toplam: ₺{order.total}</Text>
-                    {order.estimatedTime && (
-                      <Text fontSize="sm" color="gray.600">
-                        Tahmini süre: {order.estimatedTime} dakika
-                      </Text>
-                    )}
-                  </VStack>
-                </HStack>
-              </Box>
-            ))}
-          </VStack>
-        )}
+    <Box flex={1} bg="white" safeArea>
+      <ScrollView flex={1} showsVerticalScrollIndicator={false}>
+        {/* Header */}
+        <Box bg="white" px={6} py={5} borderBottomWidth={1} borderBottomColor="gray.100">
+          <Text fontSize="28px" fontWeight="700" color="gray.900" letterSpacing="-0.5">
+            Siparişlerim
+          </Text>
+          <Text fontSize="15px" color="gray.600" mt={2} fontWeight="400">
+            Aktif ve geçmiş siparişlerinizi takip edin
+          </Text>
+        </Box>
 
-        {/* Geçmiş Siparişler */}
-        <VStack space={4} pb={4}>
-          <Text fontSize="lg" fontWeight="semibold" color="gray.800">Geçmiş Siparişler</Text>
-          <VStack space={4}>
-            {pastOrders.length === 0 ? (
-              <Text color="gray.400" textAlign="center">Geçmiş sipariş bulunmuyor.</Text>
-            ) : (
-              pastOrders.map(order => (
-                <Box key={order.id} bg="white" p={4} rounded="lg" shadow={1}>
-                  <HStack justifyContent="space-between" alignItems="center" mb={3}>
-                    <VStack>
-                      <Text fontWeight="semibold" color="gray.800">Sipariş #{order.id}</Text>
-                      <Text color="gray.500" fontSize="sm">{order.date} - {order.time}</Text>
-                    </VStack>
-                    <HStack space={2} alignItems="center">
-                      <Icon 
-                        as={MaterialIcons} 
-                        name={getStatusIcon(order.status)} 
-                        size="md" 
-                        color={getStatusColor(order.status)} 
-                      />
-                      <Text fontWeight="bold" color={getStatusColor(order.status)}>
-                        {order.statusText}
-                      </Text>
-                    </HStack>
-                  </HStack>
-                  
-                  <VStack space={2} mb={3}>
-                    {order.items.map(item => (
-                      <HStack key={item.id} justifyContent="space-between" alignItems="center">
-                        <Text color="gray.700">{item.name} x{item.quantity}</Text>
-                        <Text color="gray.600">₺{item.price * item.quantity}</Text>
-                      </HStack>
-                    ))}
-                  </VStack>
-                  
-                  <Divider mb={3} />
-                  
-                  <Text fontWeight="bold" color="primary.700">Toplam: ₺{order.total}</Text>
+        <Box px={6} py={5}>
+          {/* Aktif Siparişler */}
+          {activeOrders.length > 0 && (
+            <VStack space={6} mb={8}>
+              <Box>
+                <Text fontSize="20px" fontWeight="600" color="gray.900" mb={5}>
+                  Aktif Siparişler
+                </Text>
+                <VStack space={4}>
+                  {activeOrders.map(order => {
+                    const statusConfig = getStatusConfig(order.status);
+                    return (
+                      <Box key={order.id} bg="white" borderWidth={1} borderColor="gray.200" rounded="2xl" overflow="hidden" shadow="sm">
+                        {/* Header */}
+                        <Box px={5} py={4} bg="gray.50" borderBottomWidth={1} borderBottomColor="gray.100">
+                          <HStack justifyContent="space-between" alignItems="center">
+                            <VStack>
+                              <Text fontSize="16px" fontWeight="600" color="gray.900">
+                                Sipariş #{order.id}
+                              </Text>
+                              <Text fontSize="13px" color="gray.500" mt={1} fontWeight="400">
+                                {order.date} • {order.time}
+                              </Text>
+                            </VStack>
+                            <Box 
+                              bg={statusConfig.bg} 
+                              px={3} 
+                              py={1.5} 
+                              rounded="lg"
+                              borderWidth={1}
+                              borderColor={statusConfig.color + '20'}
+                              maxW="140px"
+                            >
+                              <HStack space={1.5} alignItems="center">
+                                <Icon 
+                                  as={MaterialIcons} 
+                                  name={statusConfig.icon} 
+                                  size={4} 
+                                  color={statusConfig.color} 
+                                />
+                                <Text fontSize="13px" fontWeight="600" color={statusConfig.color} numberOfLines={1}>
+                                  {order.statusText}
+                                </Text>
+                              </HStack>
+                            </Box>
+                          </HStack>
+                        </Box>
+
+                        {/* Content */}
+                        <Box px={5} py={4}>
+                          {/* Items */}
+                          <VStack space={3} mb={4}>
+                            {order.items.map(item => (
+                              <HStack key={item.id} justifyContent="space-between" alignItems="center">
+                                <Text fontSize="14px" color="gray.700" fontWeight="500">{item.name}</Text>
+                                <HStack space={2} alignItems="center">
+                                  <Text fontSize="13px" color="gray.500" fontWeight="400">x{item.quantity}</Text>
+                                  <Text fontSize="14px" fontWeight="600" color="gray.900">
+                                    ₺{item.price * item.quantity}
+                                  </Text>
+                                </HStack>
+                              </HStack>
+                            ))}
+                          </VStack>
+
+                          {/* Footer */}
+                          <Box pt={3} borderTopWidth={1} borderTopColor="gray.100">
+                            <HStack justifyContent="space-between" alignItems="center">
+                              <VStack>
+                                <Text fontSize="16px" fontWeight="700" color="gray.900">
+                                  Toplam: ₺{order.total}
+                                </Text>
+                                {order.estimatedTime && (
+                                  <Text fontSize="13px" color="gray.500" mt={1} fontWeight="400">
+                                    Tahmini süre: {order.estimatedTime} dakika
+                                  </Text>
+                                )}
+                              </VStack>
+                            </HStack>
+                          </Box>
+                        </Box>
+                      </Box>
+                    );
+                  })}
+                </VStack>
+              </Box>
+            </VStack>
+          )}
+
+          {/* Geçmiş Siparişler */}
+          <VStack space={6}>
+            <Box>
+              <Text fontSize="20px" fontWeight="600" color="gray.900" mb={5}>
+                Geçmiş Siparişler
+              </Text>
+              {pastOrders.length === 0 ? (
+                <Box alignItems="center" py={12} bg="gray.50" rounded="2xl" borderWidth={1} borderColor="gray.200">
+                  <Icon as={MaterialIcons} name="history" size={10} color="gray.400" mb={3} />
+                  <Text fontSize="16px" color="gray.500" fontWeight="600" mb={2}>Geçmiş sipariş bulunmuyor</Text>
+                  <Text fontSize="14px" color="gray.400" textAlign="center" px={6}>
+                    Daha önce verdiğiniz siparişler burada görünecek
+                  </Text>
                 </Box>
-              ))
-            )}
+              ) : (
+                <VStack space={3}>
+                  {pastOrders.map(order => {
+                    const statusConfig = getStatusConfig(order.status);
+                    return (
+                      <Box key={order.id} bg="white" borderWidth={1} borderColor="gray.200" rounded="2xl" overflow="hidden" shadow="sm">
+                        <Box px={5} py={4}>
+                          <HStack justifyContent="space-between" alignItems="center" mb={3}>
+                            <VStack>
+                              <Text fontSize="16px" fontWeight="600" color="gray.900">
+                                Sipariş #{order.id}
+                              </Text>
+                              <Text fontSize="13px" color="gray.500" mt={1} fontWeight="400">
+                                {order.date} • {order.time}
+                              </Text>
+                            </VStack>
+                            <Box 
+                              bg={statusConfig.bg} 
+                              px={3} 
+                              py={1.5} 
+                              rounded="lg"
+                              borderWidth={1}
+                              borderColor={statusConfig.color + '20'}
+                              maxW="140px"
+                            >
+                              <HStack space={1.5} alignItems="center">
+                                <Icon 
+                                  as={MaterialIcons} 
+                                  name={statusConfig.icon} 
+                                  size={4} 
+                                  color={statusConfig.color} 
+                                />
+                                <Text fontSize="13px" fontWeight="600" color={statusConfig.color} numberOfLines={1}>
+                                  {order.statusText}
+                                </Text>
+                              </HStack>
+                            </Box>
+                          </HStack>
+
+                          <VStack space={2} mb={3}>
+                            {order.items.map(item => (
+                              <HStack key={item.id} justifyContent="space-between" alignItems="center">
+                                <Text fontSize="14px" color="gray.700" fontWeight="500">{item.name}</Text>
+                                <HStack space={2} alignItems="center">
+                                  <Text fontSize="13px" color="gray.500" fontWeight="400">x{item.quantity}</Text>
+                                  <Text fontSize="14px" fontWeight="600" color="gray.900">
+                                    ₺{item.price * item.quantity}
+                                  </Text>
+                                </HStack>
+                              </HStack>
+                            ))}
+                          </VStack>
+
+                          <Box pt={3} borderTopWidth={1} borderTopColor="gray.100">
+                            <Text fontSize="16px" fontWeight="700" color="gray.900">
+                              Toplam: ₺{order.total}
+                            </Text>
+                          </Box>
+                        </Box>
+                      </Box>
+                    );
+                  })}
+                </VStack>
+              )}
+            </Box>
           </VStack>
-        </VStack>
+        </Box>
       </ScrollView>
     </Box>
   );
